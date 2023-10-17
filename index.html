@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+             DCT - WatchMan 
+        </title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    </head>
+    <body>
+        <div id="root">
+                
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"></script>
+        <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+        <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+        <script crossorigin src="https://unpkg.com/babel-standalone@6.26.0/babel.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js" integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+        <script type="text/babel">
+           const rootHandle = document.getElementById('root')
+           
+              
+           // Your code goes here 
+           function App (){
+
+                    
+               const {useState, useEffect } = React
+               const axios = window.axios
+              
+                const [joinList,setJoinList] = useState([])
+                const [leftList,setLeftList] = useState([])
+                const [BatchList,setBatchList] = useState([])
+
+             
+
+                const socketConnection =()=>{
+                    const socket = io('http://localhost:5502'); 
+
+                        let dataArray = [];
+
+                        socket.on('connect', () => {
+                        console.log('Connected to server');
+                        });
+
+
+                        socket.on('students',(result)=>{
+                        console.log(result)
+                        setBatchList(result)
+                    })
+
+                        socket.on('data', (data) => {
+                            
+                            const event = data.split('  ').pop()
+                            const user = data.split('  ').shift()
+                           
+                            
+                            if (event === 'joined') {
+                                    setJoinList((prevList) => [...prevList, user]);
+                                    setLeftList((prevList) => prevList.filter((u) => u !== user));
+                                } else if (event === 'left') {
+                                    setLeftList((prevList) => [...prevList, user]);
+                                    setJoinList((prevList) => prevList.filter((u) => u !== user));
+                                }
+
+                        });
+                        
+                        socket.on('disconnect', () => {
+                        console.log('Disconnected from server');
+                        });
+                }
+                
+     
+                 
+                 const reminder = ()=>{
+                            
+                 }
+                    
+                   
+
+                    useEffect(()=>{
+                        socketConnection()
+                    },[])
+
+                    return (
+                           <div className= 'container mt-3'>
+                            <h1 className="fst-italic text-primary-emphasis"> <em>WatchMan</em>  <img height="100px" style={{borderRadius:"50%"}} src="/bcc06eef-5c86-41d4-b3c3-af2e8c6cfa36.avif"/> </h1>
+                            <hr/>
+                            <div className='row'>
+                                <div className="col-lg-4">
+                                    <h3 className="display-4 text-success">Online  list -{joinList.length}</h3>
+                                <ul className="list-group">
+                                {joinList.map((user, index) => (
+                                <li key={index} className=" list-group-item list-group-item-success">{user}</li>
+                                ))}
+                             </ul>
+                                    </div>
+                                <div className="col-lg-4">
+                                    <h3 className="display-4 text-danger">Offline  list -{leftList.length}</h3>
+                                <ul className="list-group">
+                                {leftList.map((user, index) => (
+                                <li key={index} className=" list-group-item list-group-item-danger">{user} ---- <button className="btn btn-danger fw-bold"> Reminder</button></li>
+                                ))}
+                                </ul>
+                                    </div>
+                                <div className="col-lg-4">
+                                    <h3 className="display-4 text-success-emphasis">Batch list -{BatchList.length}</h3>
+                                <ul className="list-group">
+
+                                { BatchList.map((user, index) => (
+                                <li key={index} className=" list-group-item">{user.name}</li>
+                                ))}
+                                </ul>
+                                    </div>
+                            </div>
+
+                            
+                           </div>
+                            
+                    )
+             }
+
+             ReactDOM.render(<App /> , root)
+             
+        </script>
+    </body>
+</html>
+
+
+
