@@ -27,16 +27,19 @@ io.on('connection', (socket) => {
 
 app.post('/', (req, res) => {
 
-  //  console.log(req.body)
-  // const plainToken = req.body.payload.plainToken;
-  // const encryptedToken = generateEncryptedToken(plainToken);
+   console.log(req.body)
+   if( req.body.payload.plainToken){
+    const plainToken = req.body.payload.plainToken;
+  const encryptedToken = generateEncryptedToken(plainToken);
   
-  // const response = {
-  //   plainToken: plainToken,
-  //   encryptedToken: encryptedToken,
-  // };
-  // res.json(response);
+  const response = {
+    plainToken: plainToken,
+    encryptedToken: encryptedToken,
+  };
+  res.json(response);
     console.log(req.body)
+   }
+  
 
    if(req.body.event === 'meeting.started'){
 
